@@ -1,0 +1,5 @@
+cmake_minimum_required(VERSION 3.15)
+project(ImageFilterEngine)
+set(CMAKE_CXX_STANDARD 17)
+add_executable(imgfilter src/main.cpp src/image.cpp src/convolution.cpp src/kernels.cpp)
+target_include_directories(imgfilter PRIVATE include)
