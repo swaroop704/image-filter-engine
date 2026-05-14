@@ -16,4 +16,4 @@ A multithreaded image processing engine in C++ that applies convolution filters 
 
 - C++
 - stb_image and stb_image_write for image I/O
-- std::thread for multithreading
+- std::thread for multithreading!
