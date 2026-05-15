@@ -45,11 +45,11 @@ int main() {
     }
 
     else if(choice == 2) {
-    float b = 1.0f / 9.0f;
+    float v = 1.0f / 9.0f;
     float boxBlur[3][3] = {
-        {b, b, b},
-        {b, b, b},
-        {b, b, b}
+        {v, v, v},
+        {v, v, v},
+        {v, v, v}
     };
 
     applyKernel(img, result, width, height, channels, boxBlur);
