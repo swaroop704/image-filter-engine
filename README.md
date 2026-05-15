@@ -5,15 +5,14 @@ A multithreaded image processing engine in C++ that applies convolution filters 
 ## Features
 
 - Load and save PNG/JPG images
-- Generic convolution engine that accepts any kernel
-- Kernel library includes Gaussian Blur, Sharpen, Sobel Edge Detection, Emboss, Outline, and more
+- Convolution engine that accepts any kernel
+- Kernel library includes Box Blur, Gaussian Blur, Sharpen, Sobel Edge Detection, Emboss and grayscale as additional filter.
 - Multithreaded processing using std::thread - splitting image into strips, one thread per strip
-- Handles edge padding strategies - zero padding, clamp, mirror
-- Simple CLI interface to apply any filter from the terminal
+- Simple interface to apply any filter from the terminal
 - Single-threaded vs multithreaded performance analysis included
 
  ## Tech Stack
 
 - C++
 - stb_image and stb_image_write for image I/O
-- std::thread for multithreading!
+- std::thread for multithreading
