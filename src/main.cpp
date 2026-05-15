@@ -31,7 +31,7 @@ int main() {
         result[i+2]=gray;
     }
 
-    stbi_write_png("grayscale.png",width,height,channels,result,width*channels);
+    stbi_write_png("C:/Users/Swaroop/dev/projects/image filter engine/samples/output/grayscale.png",width,height,channels,result,width*channels);
 
     stbi_image_free(img);
     free(result);
