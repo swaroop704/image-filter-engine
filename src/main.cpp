@@ -45,18 +45,33 @@ int main() {
     }
 
     else if(choice == 2) {
-    float v = 1.0f / 9.0f;
-    float boxBlur[3][3] = {
-        {v, v, v},
-        {v, v, v},
-        {v, v, v}
-    };
+        float v = 1.0f / 9.0f;
+            float boxBlur[3][3] = {
+            {v, v, v},
+            {v, v, v},
+            {v, v, v}
+        };
 
-    applyKernel(img, result, width, height, channels, boxBlur);
-    stbi_write_png("C:/Users/Swaroop/dev/projects/image filter engine/samples/output/blur.png", width, height, channels, result, width * channels);
+        applyKernel(img, result, width, height, channels, boxBlur);
+        stbi_write_png("C:/Users/Swaroop/dev/projects/image filter engine/samples/output/blur.png", width, height, channels, result, width * channels);
 
-    stbi_image_free(img);
-    free(result);
+        stbi_image_free(img);
+        free(result);
+    }
+
+    else if(choice == 3) {
+        float v = 1.0f / 16.0f;
+            float boxBlur[3][3] = {
+            {1*v, 2*v, 1*v},
+            {2*v, 4*v, 2*v},
+            {1*v, 2*v, 1*v}
+        };
+
+        applyKernel(img, result, width, height, channels, boxBlur);
+        stbi_write_png("C:/Users/Swaroop/dev/projects/image filter engine/samples/output/gaussian_blur.png", width, height, channels, result, width * channels);
+
+        stbi_image_free(img);
+        free(result);
     }
     
 
