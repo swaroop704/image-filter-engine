@@ -43,6 +43,21 @@ int main() {
         stbi_image_free(img);
         free(result);
     }
+
+    else if(choice == 2) {
+    float b = 1.0f / 9.0f;
+    float boxBlur[3][3] = {
+        {b, b, b},
+        {b, b, b},
+        {b, b, b}
+    };
+
+    applyKernel(img, result, width, height, channels, boxBlur);
+    stbi_write_png("C:/Users/Swaroop/dev/projects/image filter engine/samples/output/blur.png", width, height, channels, result, width * channels);
+
+    stbi_image_free(img);
+    free(result);
+    }
     
 
     return 0;
