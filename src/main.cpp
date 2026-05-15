@@ -22,7 +22,7 @@ int main() {
 
     unsigned char* result = (unsigned char*)malloc(width*height*channels);
 
-    cout<<"Select Filter :\n1.Grayscale\n2.Box Blur\n3.Gaussian Blur\n4.Sharpen\n5.Sobel Edge Detection\n6.Emboss\n";
+    cout<<"Select Filter :\n1.Grayscale\n2.Gaussian Blur\n3.Sharpen\n4.Sobel Edge Detection\n5.Emboss\n";
     cin>>choice;
 
     if(choice==1){
@@ -45,21 +45,6 @@ int main() {
     }
 
     else if(choice == 2) {
-        float v = 1.0f / 9.0f;
-            float boxBlur[3][3] = {
-            {v, v, v},
-            {v, v, v},
-            {v, v, v}
-        };
-
-        applyKernel(img, result, width, height, channels, boxBlur);
-        stbi_write_png("C:/Users/Swaroop/dev/projects/image filter engine/samples/output/blur.png", width, height, channels, result, width * channels);
-
-        stbi_image_free(img);
-        free(result);
-    }
-
-    else if(choice == 3) {
         float v = 1.0f / 16.0f;
             float GBlur[3][3] = {
             {1*v, 2*v, 1*v},
@@ -74,7 +59,7 @@ int main() {
         free(result);
     }
     
-    else if(choice == 4) {
+    else if(choice == 3) {
         float Sharpen[3][3] = {
             {0, -1, 0},
             {-1, 5, -1},
@@ -88,7 +73,7 @@ int main() {
         free(result);
     }
 
-    else if(choice == 5) {
+    else if(choice == 4) {
         float LeftSobel[3][3] = {
             {-1, 0, 1},
             {-2, 0, 2},
@@ -112,7 +97,7 @@ int main() {
         free(result);
     }
 
-    else if(choice == 6) {
+    else if(choice == 5) {
         float Emboss[3][3] = {
             {-2, -1, 0},
             {-1, 1, 1},
