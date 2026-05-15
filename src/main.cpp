@@ -61,13 +61,13 @@ int main() {
 
     else if(choice == 3) {
         float v = 1.0f / 16.0f;
-            float boxBlur[3][3] = {
+            float GBlur[3][3] = {
             {1*v, 2*v, 1*v},
             {2*v, 4*v, 2*v},
             {1*v, 2*v, 1*v}
         };
 
-        applyKernel(img, result, width, height, channels, boxBlur);
+        applyKernel(img, result, width, height, channels, GBlur);
         stbi_write_png("C:/Users/Swaroop/dev/projects/image filter engine/samples/output/gaussian_blur.png", width, height, channels, result, width * channels);
 
         stbi_image_free(img);
@@ -75,14 +75,62 @@ int main() {
     }
     
     else if(choice == 4) {
-        float boxBlur[3][3] = {
+        float Sharpen[3][3] = {
             {0, -1, 0},
             {-1, 5, -1},
             {0, -1, 0}
         };
 
-        applyKernel(img, result, width, height, channels, boxBlur);
+        applyKernel(img, result, width, height, channels, Sharpen);
         stbi_write_png("C:/Users/Swaroop/dev/projects/image filter engine/samples/output/sharpen.png", width, height, channels, result, width * channels);
+
+        stbi_image_free(img);
+        free(result);
+    }
+
+    else if(choice == 5) {
+        float LeftSobel[3][3] = {
+            {-1, 0, 1},
+            {-2, 0, 2},
+            {-1, 0, 1}
+        };
+
+        for(int i=0;i<width*height*channels;i = i+channels){
+            int r = img[i];
+            int g = img[i+1];
+            int b = img[i+2];
+
+                int gray = 0.299*r+0.587*g+0.114*b;
+
+            img[i]=img[i+1]=img[i+2]=(unsigned char)gray;
+        }
+
+        applyKernel(img, result, width, height, channels, LeftSobel);
+        stbi_write_png("C:/Users/Swaroop/dev/projects/image filter engine/samples/output/Sobel.png", width, height, channels, result, width * channels);
+
+        stbi_image_free(img);
+        free(result);
+    }
+
+    else if(choice == 6) {
+        float Emboss[3][3] = {
+            {-2, -1, 0},
+            {-1, 1, 1},
+            {0, 1, 2}
+        };
+
+         for(int i=0;i<width*height*channels;i = i+channels){
+            int r = img[i];
+            int g = img[i+1];
+            int b = img[i+2];
+
+                int gray = 0.299*r+0.587*g+0.114*b;
+
+            img[i]=img[i+1]=img[i+2]=(unsigned char)gray;
+        }
+
+        applyKernel(img, result, width, height, channels, Emboss);
+        stbi_write_png("C:/Users/Swaroop/dev/projects/image filter engine/samples/output/Emboss.png", width, height, channels, result, width * channels);
 
         stbi_image_free(img);
         free(result);
@@ -114,9 +162,9 @@ void applyKernel(unsigned char* img, unsigned char* result, int width, int heigh
 
         int outIndex = (y * width + x) * channels;
 
-        result[outIndex]     = (unsigned char)std::min(std::max((int)r, 0), 255);
-        result[outIndex + 1] = (unsigned char)std::min(std::max((int)g, 0), 255);
-        result[outIndex + 2] = (unsigned char)std::min(std::max((int)b, 0), 255);
+        result[outIndex]     = (unsigned char)std::min(std::max((int)abs(r), 0), 255);
+        result[outIndex + 1] = (unsigned char)std::min(std::max((int)abs(g), 0), 255);
+        result[outIndex + 2] = (unsigned char)std::min(std::max((int)abs(b), 0), 255);
         }
     }
 
