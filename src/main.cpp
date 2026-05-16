@@ -30,59 +30,57 @@ int main()
     cin >> choice;
 
     if (choice == 1)
-{
-    omp_set_num_threads(1);
-    auto startS = std::chrono::high_resolution_clock::now();
-
-    #pragma omp parallel for schedule(static)
-    for (int i = 0; i < width * height * channels; i = i + channels)
     {
-        int r = img[i];
-        int g = img[i + 1];
-        int b = img[i + 2];
+        omp_set_num_threads(1);
+        auto startS = std::chrono::high_resolution_clock::now();
 
-        int gray = 0.299 * r + 0.587 * g + 0.114 * b;
+#pragma omp parallel for schedule(static)
+        for (int i = 0; i < width * height * channels; i = i + channels)
+        {
+            int r = img[i];
+            int g = img[i + 1];
+            int b = img[i + 2];
 
-        result[i]     = gray;
-        result[i + 1] = gray;
-        result[i + 2] = gray;
+            int gray = 0.299 * r + 0.587 * g + 0.114 * b;
+
+            result[i] = gray;
+            result[i + 1] = gray;
+            result[i + 2] = gray;
+        }
+
+        auto endS = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<double> diffS = endS - startS;
+
+        omp_set_num_threads(omp_get_max_threads());
+        auto startP = std::chrono::high_resolution_clock::now();
+
+#pragma omp parallel for schedule(static)
+        for (int i = 0; i < width * height * channels; i = i + channels)
+        {
+            int r = img[i];
+            int g = img[i + 1];
+            int b = img[i + 2];
+
+            int gray = 0.299 * r + 0.587 * g + 0.114 * b;
+
+            result[i] = gray;
+            result[i + 1] = gray;
+            result[i + 2] = gray;
+        }
+
+        auto endP = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<double> diffP = endP - startP;
+
+        cout << "\nGrayscale Filter Performance" << endl;
+        cout << "Serial Time:   " << diffS.count() << " s" << endl;
+        cout << "Parallel Time: " << diffP.count() << " s" << endl;
+        cout << "Speedup:       " << diffS.count() / diffP.count() << "x" << endl;
+
+        stbi_write_png("C:/Users/Swaroop/dev/projects/image filter engine/samples/output/grayscale.png", width, height, channels, result, width * channels);
+
+        stbi_image_free(img);
+        free(result);
     }
-
-    auto endS = std::chrono::high_resolution_clock::now();
-    std::chrono::duration<double> diffS = endS - startS;
-
-
-    omp_set_num_threads(omp_get_max_threads());
-    auto startP = std::chrono::high_resolution_clock::now();
-
-    #pragma omp parallel for schedule(static)
-    for (int i = 0; i < width * height * channels; i = i + channels)
-    {
-        int r = img[i];
-        int g = img[i + 1];
-        int b = img[i + 2];
-
-        int gray = 0.299 * r + 0.587 * g + 0.114 * b;
-
-        result[i]     = gray;
-        result[i + 1] = gray;
-        result[i + 2] = gray;
-    }
-
-    auto endP = std::chrono::high_resolution_clock::now();
-    std::chrono::duration<double> diffP = endP - startP;
-
-
-    cout << "\nGrayscale Filter Performance" << endl;
-    cout << "Serial Time:   " << diffS.count() << " s" << endl;
-    cout << "Parallel Time: " << diffP.count() << " s" << endl;
-    cout << "Speedup:       " << diffS.count() / diffP.count() << "x" << endl;
-
-    stbi_write_png("C:/Users/Swaroop/dev/projects/image filter engine/samples/output/grayscale.png", width, height, channels, result, width * channels);
-
-    stbi_image_free(img);
-    free(result);
-}
 
     else if (choice == 2)
     {
@@ -156,37 +154,117 @@ int main()
             {-2, 0, 2},
             {-1, 0, 1}};
 
+        float TopSobel[3][3] = {
+            {-1, -2, -1},
+            {0, 0, 0},
+            {1, 2, 1}};
+
 #pragma omp parallel for schedule(static)
-
-        for (int i = 0; i < width * height * channels; i = i + channels)
+        for (int i = 0; i < width * height * channels; i += channels)
         {
-            int r = img[i];
-            int g = img[i + 1];
-            int b = img[i + 2];
-
-            int gray = 0.299 * r + 0.587 * g + 0.114 * b;
-
+            int gray = 0.299 * img[i] + 0.587 * img[i + 1] + 0.114 * img[i + 2];
             img[i] = img[i + 1] = img[i + 2] = (unsigned char)gray;
         }
 
         omp_set_num_threads(1);
-
         auto startS = std::chrono::high_resolution_clock::now();
-        applyKernel(img, result, width, height, channels, LeftSobel);
+
+        for (int y = 1; y < height - 1; y++)
+        {
+            for (int x = 1; x < width - 1; x++)
+            {
+                float rX = 0, gX = 0, bX = 0;
+                float rY = 0, gY = 0, bY = 0;
+
+                for (int KernelY = -1; KernelY <= 1; KernelY++)
+                {
+                    for (int KernelX = -1; KernelX <= 1; KernelX++)
+                    {
+                        int neighbourX = x + KernelX;
+                        int neighbourY = y + KernelY;
+
+                        int index = (neighbourY * width + neighbourX) * channels;
+
+                        float KernelIndexX = LeftSobel[KernelY + 1][KernelX + 1];
+                        float KernelIndexY = TopSobel[KernelY + 1][KernelX + 1];
+
+                        rX += img[index] * KernelIndexX;
+                        gX += img[index + 1] * KernelIndexX;
+                        bX += img[index + 2] * KernelIndexX;
+
+                        rY += img[index] * KernelIndexY;
+                        gY += img[index + 1] * KernelIndexY;
+                        bY += img[index + 2] * KernelIndexY;
+                    }
+                }
+
+                int outIndex = (y * width + x) * channels;
+
+                int finalR = (int)std::sqrt(rX * rX + rY * rY);
+                int finalG = (int)std::sqrt(gX * gX + gY * gY);
+                int finalB = (int)std::sqrt(bX * bX + bY * bY);
+
+                result[outIndex] = (unsigned char)std::min(std::max(finalR, 0), 255);
+                result[outIndex + 1] = (unsigned char)std::min(std::max(finalG, 0), 255);
+                result[outIndex + 2] = (unsigned char)std::min(std::max(finalB, 0), 255);
+            }
+        }
         auto endS = std::chrono::high_resolution_clock::now();
         std::chrono::duration<double> diffS = endS - startS;
 
         omp_set_num_threads(8);
-
         auto startP = std::chrono::high_resolution_clock::now();
-        applyKernel(img, result, width, height, channels, LeftSobel);
+
+#pragma omp parallel for schedule(static)
+        for (int y = 1; y < height - 1; y++)
+        {
+            for (int x = 1; x < width - 1; x++)
+            {
+                float rX = 0, gX = 0, bX = 0;
+                float rY = 0, gY = 0, bY = 0;
+
+                for (int KernelY = -1; KernelY <= 1; KernelY++)
+                {
+                    for (int KernelX = -1; KernelX <= 1; KernelX++)
+                    {
+                        int neighbourX = x + KernelX;
+                        int neighbourY = y + KernelY;
+
+                        int index = (neighbourY * width + neighbourX) * channels;
+
+                        float KernelIndexX = LeftSobel[KernelY + 1][KernelX + 1];
+                        float KernelIndexY = TopSobel[KernelY + 1][KernelX + 1];
+
+                        rX += img[index] * KernelIndexX;
+                        gX += img[index + 1] * KernelIndexX;
+                        bX += img[index + 2] * KernelIndexX;
+
+                        rY += img[index] * KernelIndexY;
+                        gY += img[index + 1] * KernelIndexY;
+                        bY += img[index + 2] * KernelIndexY;
+                    }
+                }
+
+                int outIndex = (y * width + x) * channels;
+
+                int finalR = (int)std::sqrt(rX * rX + rY * rY);
+                int finalG = (int)std::sqrt(gX * gX + gY * gY);
+                int finalB = (int)std::sqrt(bX * bX + bY * bY);
+
+                result[outIndex] = (unsigned char)std::min(std::max(finalR, 0), 255);
+                result[outIndex + 1] = (unsigned char)std::min(std::max(finalG, 0), 255);
+                result[outIndex + 2] = (unsigned char)std::min(std::max(finalB, 0), 255);
+            }
+        }
         auto endP = std::chrono::high_resolution_clock::now();
         std::chrono::duration<double> diffP = endP - startP;
 
-        cout << "Sobel edge detection Performance" << endl;
+        cout << "\n--- Directional Sobel Edge Detection Performance ---" << endl;
         cout << "Serial Time:   " << diffS.count() << "s" << endl;
         cout << "Parallel Time: " << diffP.count() << "s" << endl;
         cout << "Speedup:       " << diffS.count() / diffP.count() << "x" << endl;
+        cout << "----------------------------------------------------\n"
+             << endl;
 
         stbi_write_png("C:/Users/Swaroop/dev/projects/image filter engine/samples/output/Sobel.png", width, height, channels, result, width * channels);
 
