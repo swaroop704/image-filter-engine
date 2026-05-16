@@ -30,28 +30,59 @@ int main()
     cin >> choice;
 
     if (choice == 1)
+{
+    omp_set_num_threads(1);
+    auto startS = std::chrono::high_resolution_clock::now();
+
+    #pragma omp parallel for schedule(static)
+    for (int i = 0; i < width * height * channels; i = i + channels)
     {
+        int r = img[i];
+        int g = img[i + 1];
+        int b = img[i + 2];
 
-#pragma omp parallel for schedule(static)
+        int gray = 0.299 * r + 0.587 * g + 0.114 * b;
 
-        for (int i = 0; i < width * height * channels; i = i + channels)
-        {
-            int r = img[i];
-            int g = img[i + 1];
-            int b = img[i + 2];
-
-            int gray = 0.299 * r + 0.587 * g + 0.114 * b;
-
-            result[i] = gray;
-            result[i + 1] = gray;
-            result[i + 2] = gray;
-        }
-
-        stbi_write_png("C:/Users/Swaroop/dev/projects/image filter engine/samples/output/grayscale.png", width, height, channels, result, width * channels);
-
-        stbi_image_free(img);
-        free(result);
+        result[i]     = gray;
+        result[i + 1] = gray;
+        result[i + 2] = gray;
     }
+
+    auto endS = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> diffS = endS - startS;
+
+
+    omp_set_num_threads(omp_get_max_threads());
+    auto startP = std::chrono::high_resolution_clock::now();
+
+    #pragma omp parallel for schedule(static)
+    for (int i = 0; i < width * height * channels; i = i + channels)
+    {
+        int r = img[i];
+        int g = img[i + 1];
+        int b = img[i + 2];
+
+        int gray = 0.299 * r + 0.587 * g + 0.114 * b;
+
+        result[i]     = gray;
+        result[i + 1] = gray;
+        result[i + 2] = gray;
+    }
+
+    auto endP = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> diffP = endP - startP;
+
+
+    cout << "\nGrayscale Filter Performance" << endl;
+    cout << "Serial Time:   " << diffS.count() << " s" << endl;
+    cout << "Parallel Time: " << diffP.count() << " s" << endl;
+    cout << "Speedup:       " << diffS.count() / diffP.count() << "x" << endl;
+
+    stbi_write_png("C:/Users/Swaroop/dev/projects/image filter engine/samples/output/grayscale.png", width, height, channels, result, width * channels);
+
+    stbi_image_free(img);
+    free(result);
+}
 
     else if (choice == 2)
     {
