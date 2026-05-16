@@ -9,11 +9,11 @@ A multithreaded image processing engine written in C++ that applies convolution 
 You give it an image and it applies a filter, it tells you how long it took with one thread vs multiple threads.
 
 Filters available:
-- **Gaussian Blur** — smooths out noise and fine details (the blur can be imporved by using a larger size kernel)
-- **Sharpen** — makes edges and details pop
-- **Sobel Edge Detection** — finds and highlights the outlines of objects
-- **Emboss** — gives the image a raised, 3D look
-- **Grayscale** — get rid of all color, converts to black and white
+- **Gaussian Blur** - smooths out noise and fine details (the blur can be imporved by using a larger size kernel)
+- **Sharpen** - makes edges and details pop
+- **Sobel Edge Detection** - finds and highlights the outlines of objects
+- **Emboss** - gives the image a raised, 3D look
+- **Grayscale** - get rid of all color, converts to black and white
 
 ---
 
@@ -30,8 +30,8 @@ After processing, it prints out the time taken for both single-threaded and mult
 ## Tech stack
 
 - **C++**
-- **stb_image / stb_image_write** — for loading and saving PNG/JPG images
-- **OpenMP** — for multithreading (no external libraries needed)
+- **stb_image / stb_image_write** - for loading and saving PNG/JPG images
+- **OpenMP** - for multithreading (no external libraries needed)
 
 ---
 
@@ -63,4 +63,4 @@ Tested on a 1632 × 736 image with 8 threads:
 | Sobel Edge | 0.00941s | 0.00338s | 2.78x |
 | Emboss | 0.00821s | 0.00189s | 4.35x |
 
-Gaussian Blur sees the biggest gain because its workload is very uniform — perfect for splitting evenly across threads. Sobel is lower because it runs two kernel passes plus a square root per pixel, which is heavier work per thread.
+Gaussian Blur sees the biggest gain because its workload is very uniform, perfect for splitting evenly across threads. Sobel is lower because it runs two kernel passes plus a square root per pixel, which is heavier work per thread.
